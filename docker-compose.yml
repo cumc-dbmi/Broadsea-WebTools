@@ -1,29 +1,30 @@
 version: '2'
-
 services:
-
   broadsea-webtools:
     build: .
-    image: ohdsi/broadsea-webtools
+    image: analyticsdev.azurecr.io/dbmi/broadsea-webtools:latest
     ports:
-      - "8080:8080"
+      - ${BROADSEA_LOCAL_PORT}:8080
     volumes:
      - .:/tmp/drivers/:ro
      - ./config-local.js:/usr/local/tomcat/webapps/atlas/js/config-local.js:ro
      - ./config-gis.js:/usr/local/tomcat/webapps/atlas/js/config-gis.js:ro
     environment:
-      - WEBAPI_URL=http://192.168.1.8:8080
-      - datasource_driverClassName=org.postgresql.Driver
-      - datasource_url=jdbc:postgresql://192.168.1.8:5432/secret-database-name
-      - datasource_username=secret-user-name
-      - datasource_password=secret-user-password
-      - spring.jpa.properties.hibernate.default_schema=ohdsi
-      - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-      - spring.batch.repository.tableprefix=ohdsi.BATCH_
-      - flyway_datasource_driverClassName=org.postgresql.Driver
-      - flyway_datasource_url=jdbc:postgresql://192.168.1.8:5432/secret-database-name
-      - flyway_schemas=ohdsi
-      - flyway.placeholders.ohdsiSchema=ohdsi
-      - flyway_datasource_username=secret-user-name
-      - flyway_datasource_password=secret-user-password
-      - flyway.locations=classpath:db/migration/postgresql
+     - WEBAPI_URL=${BROADSEA_LOCAL_WEBAPI_URL}
+     - env=webapi-mssql
+     - datasource.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
+     - datasource.url=${BROADSEA_LOCAL_DATASOURCE_JDBC_URL}
+     - datasource.username=${BROADSEA_LOCAL_DATASOURCE_JDBC_USER}
+     - datasource.password=${BROADSEA_LOCAL_DATASOURCE_JDBC_PASSWORD}
+     - spring.jpa.properties.hibernate.default_schema=dbo
+     - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.SQLServer2012Dialect
+     - spring.batch.repository.tableprefix=webapi.dbo.BATCH_
+     - flyway.enabled=true
+     - flyway.datasource.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
+     - flyway.datasource.url=${BROADSEA_LOCAL_DATASOURCE_JDBC_URL}
+     - flyway.schemas=dbo
+     - flyway.placeholders.ohdsiSchema=dbo
+     - flyway.datasource.username=${BROADSEA_LOCAL_FLYWAY_DATASOURCE_USER}
+     - flyway.datasource.password=${BROADSEA_LOCAL_FLYWAY_DATASOURCE_JDBC_PASSWORD}
+     - flyway.locations=classpath:db/migration/sqlserver
+     - security.enabled=false
