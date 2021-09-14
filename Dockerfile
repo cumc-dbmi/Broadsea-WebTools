@@ -68,5 +68,8 @@ COPY config-gis.js /usr/local/tomcat/webapps/atlas/js/
 COPY deploy-script.sh /usr/local/tomcat/bin/
 RUN chmod +x /usr/local/tomcat/bin/deploy-script.sh
 
+# modify host to map database server to deal with ACI resolution issue
+RUN echo "10.144.72.55 nysgcdwdb.sis.nyp.org" >> /etc/hosts
+
 # run supervisord to execute the deploy script (which also starts the tomcat server)
 CMD ["/usr/bin/supervisord"]
