@@ -1,4 +1,4 @@
-FROM tomcat:9.0.46-jdk8-openjdk-buster
+FROM tomcat:9.0.98-jdk8-temurin-jammy
 
 MAINTAINER Lee Evans - www.ltscomputingllc.com
 
