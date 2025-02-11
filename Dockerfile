@@ -1,6 +1,6 @@
 FROM tomcat:9.0.98-jdk8-temurin-jammy
 
-MAINTAINER Lee Evans - www.ltscomputingllc.com
+LABEL maintainer="Lee Evans - www.ltscomputingllc.com"
 
 # OHDSI WebAPI and ATLAS web application running in Tomcat
 
@@ -17,22 +17,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     supervisor \
     build-essential \
-    nodejs \
     curl \
     git-core \
     && rm -rf /var/lib/apt/lists/*
 
-# install npm and upgrade it to the latest version
-WORKDIR ~
-RUN curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh \
-    && chmod +x nodesource_setup.sh \
-    && bash nodesource_setup.sh
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    npm \
-    && rm -rf /var/lib/apt/lists/*
-RUN npm install -g npm
-
-# deploy the OHDSI WEBAPI and OHDSI ATLAS web application to the Tomcat server
+# Install Node.js (use LTS version for stability)
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm
 
 # set working directory to the Tomcat server webapps directory
 WORKDIR /usr/local/tomcat/webapps
@@ -60,16 +52,11 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # install Atlas local configuration file
 COPY config-local.js /usr/local/tomcat/webapps/atlas/js/
-
-# install Atlas GIS local configuration file
 COPY config-gis.js /usr/local/tomcat/webapps/atlas/js/
 
 # install the bash shell deploy script that supervisord will run whenever the container is started
 COPY deploy-script.sh /usr/local/tomcat/bin/
 RUN chmod +x /usr/local/tomcat/bin/deploy-script.sh
-
-# modify host to map database server to deal with ACI resolution issue
-RUN echo "10.144.72.55 nysgcdwdb.sis.nyp.org" >> /etc/hosts
 
 # run supervisord to execute the deploy script (which also starts the tomcat server)
 CMD ["/usr/bin/supervisord"]
