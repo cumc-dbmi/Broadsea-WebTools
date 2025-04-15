@@ -1,6 +1,6 @@
-FROM tomcat:9.0.98-jdk8-temurin-jammy
+FROM tomcat:9.0.102-jdk8-temurin-jammy
 
-LABEL maintainer="Lee Evans - www.ltscomputingllc.com"
+LABEL maintainer="Krishna - kk3326@cumc.columbia.edu"
 
 # OHDSI WebAPI and ATLAS web application running in Tomcat
 
